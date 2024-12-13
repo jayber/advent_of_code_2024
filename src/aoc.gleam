@@ -5,46 +5,67 @@ import gleam/result
 import gleam/string
 import simplifile
 
+pub type SafetyBound {
+  Up
+  Down
+  Out
+}
+
 pub fn main() {
   let assert Ok(value) = simplifile.read(from: "C:/work/aoc/aoc.txt")
-  let #(even, odd) = parse_and_sort(value)
+  let records = parse(string.trim(value))
 
-  let data_points = similarity(even, odd)
-  io.debug(data_points)
+  io.debug(records)
+  io.debug("length: " <> int.to_string(list.length(records)))
 
-  sum(data_points)
-  |> result.map(fn(result) { "here is the result: " <> int.to_string(result) })
-  |> result.unwrap("")
-  |> io.println()
+  let count =
+    records
+    |> check_safety()
+    |> list.count(fn(entry) { entry == True })
+
+  io.println("safe: " <> int.to_string(count))
 }
 
-pub fn sum(data_points: List(Int)) {
-  data_points
-  |> list.reduce(fn(acc, distance) { acc + distance })
+pub fn check_safety(records: List(List(Int))) -> List(Bool) {
+  records
+  |> list.map(convert_to_diffs)
+  |> list.map(evaluate_safe)
 }
 
-pub fn similarity(even, odd) {
-  even
+pub fn convert_to_diffs(record: List(Int)) -> List(SafetyBound) {
+  list.window_by_2(record)
   |> list.map(fn(item) {
-    item * list.count(odd, fn(target_item) { item == target_item })
+    case item.1 - item.0 {
+      result if result > 0 && result <= 3 -> Up
+      result if result < 0 && result >= -3 -> Down
+      _ -> Out
+    }
   })
 }
 
-pub fn parse_and_sort(input: String) -> #(List(Int), List(Int)) {
-  let #(even, odd) =
-    string.split(input, "\r\n")
-    |> list.flat_map(fn(line) { string.split(line, "   ") })
+pub fn evaluate_safe(record: List(SafetyBound)) -> Bool {
+  list.window_by_2(record)
+  |> list.all(fn(entry) {
+    entry.0 != Out && entry.1 != Out && entry.0 == entry.1
+  })
+}
+
+fn parse_rows(input: String) -> List(String) {
+  string.split(input, "\n")
+  |> list.map(string.trim)
+}
+
+fn parse_records(rows: List(String)) -> List(List(Int)) {
+  rows
+  |> list.map(fn(row) {
+    string.split(row, " ")
     |> list.map(int.parse)
     |> list.map(result.unwrap(_, 0))
-    |> list.index_map(fn(item, index) { #(item, index) })
-    |> list.partition(fn(item) { int.is_even(item.1) })
+  })
+}
 
-  #(
-    even
-      |> list.map(fn(item: #(Int, Int)) { item.0 })
-      |> list.sort(int.compare),
-    odd
-      |> list.map(fn(item: #(Int, Int)) { item.0 })
-      |> list.sort(int.compare),
-  )
+pub fn parse(input: String) -> List(List(Int)) {
+  input
+  |> parse_rows()
+  |> parse_records()
 }
