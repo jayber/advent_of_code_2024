@@ -9,7 +9,7 @@ pub fn main() {
   let assert Ok(value) = simplifile.read(from: "C:/work/aoc/aoc.txt")
   let #(even, odd) = parse_and_sort(value)
 
-  let data_points = calc_distance(even, odd)
+  let data_points = similarity(even, odd)
   io.debug(data_points)
 
   sum(data_points)
@@ -18,20 +18,20 @@ pub fn main() {
   |> io.println()
 }
 
-fn sum(data_points) {
-  list.map(data_points, fn(item: #(#(Int, Int), Int)) { item.1 })
+pub fn sum(data_points: List(Int)) {
+  data_points
   |> list.reduce(fn(acc, distance) { acc + distance })
 }
 
-fn calc_distance(even, odd) {
-  let assert Ok(pairs) = list.strict_zip(even, odd)
-  pairs
-  |> list.map(fn(pair: #(Int, Int)) {
-    #(pair, int.absolute_value(pair.0 - pair.1))
+pub fn similarity(even, odd) {
+  even |> list.map(fn(item) {
+    item * list.count(odd, fn(target_item) {
+      item == target_item
+    })
   })
 }
 
-fn parse_and_sort(input: String) -> #(List(Int), List(Int)) {
+pub fn parse_and_sort(input: String) -> #(List(Int), List(Int)) {
   let #(even, odd) =
     string.split(input, "\r\n")
     |> list.flat_map(fn(line) { string.split(line, "   ") })
