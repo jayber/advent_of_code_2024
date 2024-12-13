@@ -24,10 +24,9 @@ pub fn sum(data_points: List(Int)) {
 }
 
 pub fn similarity(even, odd) {
-  even |> list.map(fn(item) {
-    item * list.count(odd, fn(target_item) {
-      item == target_item
-    })
+  even
+  |> list.map(fn(item) {
+    item * list.count(odd, fn(target_item) { item == target_item })
   })
 }
 
