@@ -21,15 +21,21 @@ pub fn main() {
   let count =
     records
     |> check_safety()
-    |> list.count(fn(entry) { entry == True })
+    |> list.count(fn(entry) { entry })
 
   io.println("safe: " <> int.to_string(count))
 }
 
 pub fn check_safety(records: List(List(Int))) -> List(Bool) {
   records
-  |> list.map(convert_to_diffs)
-  |> list.map(evaluate_safe)
+  |> list.map(check_record)
+}
+
+pub fn check_record(record: List(Int)) -> Bool {
+  case convert_to_diffs(record) |> evaluate_safe {
+    False -> check_dampener(record)
+    value -> value
+  }
 }
 
 pub fn convert_to_diffs(record: List(Int)) -> List(SafetyBound) {
@@ -44,10 +50,36 @@ pub fn convert_to_diffs(record: List(Int)) -> List(SafetyBound) {
 }
 
 pub fn evaluate_safe(record: List(SafetyBound)) -> Bool {
-  list.window_by_2(record)
-  |> list.all(fn(entry) {
-    entry.0 != Out && entry.1 != Out && entry.0 == entry.1
+  record
+  |> list.all(fn(entry) { entry != Out })
+  && list.window_by_2(record)
+  |> list.all(fn(entry) { entry.0 == entry.1 })
+}
+
+pub fn check_dampener(record: List(Int)) -> Bool {
+  generate_variants(record,0,[])
+  |> list.any(fn(variant) {
+    variant
+    |> convert_to_diffs()
+    |> evaluate_safe
   })
+}
+
+fn generate_variants(
+  record: List(Int),
+  position: Int,
+  acc: List(List(Int))
+) -> List(List(Int)) {
+  let acc = [drop_by_index(record, position), ..acc]
+
+  case position == list.length(record) {
+    True -> acc
+    False -> generate_variants(record, position + 1, acc)
+  }
+}
+
+pub fn drop_by_index(record, position) {
+  list.append(list.take(record, position), list.drop(record, position + 1))
 }
 
 fn parse_rows(input: String) -> List(String) {
