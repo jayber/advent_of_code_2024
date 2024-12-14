@@ -1,13 +1,13 @@
 import aoc.{
   Down, Out, Up, check_dampener, check_record, check_safety, convert_to_diffs,
-  evaluate_safe, drop_by_index, parse,
+  drop_by_index, evaluate_safe, parse,
 }
 import gleeunit
 import gleeunit/should
 
 pub fn main() {
-    gleeunit.main()
-//  gen_var_test()
+  gleeunit.main()
+  //  gen_var_test()
 }
 
 pub fn parse_test() {

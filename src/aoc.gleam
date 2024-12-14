@@ -57,7 +57,7 @@ pub fn evaluate_safe(record: List(SafetyBound)) -> Bool {
 }
 
 pub fn check_dampener(record: List(Int)) -> Bool {
-  generate_variants(record,0,[])
+  generate_variants(record, 0, [])
   |> list.any(fn(variant) {
     variant
     |> convert_to_diffs()
@@ -68,7 +68,7 @@ pub fn check_dampener(record: List(Int)) -> Bool {
 fn generate_variants(
   record: List(Int),
   position: Int,
-  acc: List(List(Int))
+  acc: List(List(Int)),
 ) -> List(List(Int)) {
   let acc = [drop_by_index(record, position), ..acc]
 
