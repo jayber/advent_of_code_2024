@@ -8,11 +8,30 @@ pub fn main() {
   let assert Ok(value) = simplifile.read(from: "C:/work/aoc/aoc.txt")
 
   let result =
-    parse_instructions(value)
+    parse_dos(value)
+    |> parse_instructions()
     |> run_calculations()
     |> sumup
 
   io.println("total: " <> int.to_string(result))
+}
+
+pub fn parse_dos(input: String) -> String {
+  let assert Ok(exp) = regexp.from_string("(don?'?t?\\(\\))")
+  let #(acc, values) =
+    regexp.split(with: exp, content: input)
+    |> list.map_fold(True, fn(should, element) {
+      case should, element {
+        _, "do()" -> #(True, "")
+        _, "don't()" -> #(False, "")
+        True, value -> #(True, value)
+        _, _ -> #(should, "")
+      }
+    })
+  let assert Ok(values) =
+    values
+    |> list.reduce(fn(acc, element) { acc <> element })
+  values
 }
 
 pub fn parse_instructions(input: String) -> List(String) {

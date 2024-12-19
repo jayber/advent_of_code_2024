@@ -1,10 +1,16 @@
-import aoc.{parse_instructions, run_calculations, sumup}
+import aoc.{parse_dos, parse_instructions, run_calculations, sumup}
+import gleam/regexp
 import gleeunit
 import gleeunit/should
 
 pub fn main() {
   gleeunit.main()
   //  ingest_instruction_test()
+}
+
+pub fn parse_dos_test() {
+  let assert "8sadhffhaf8cnojadf9009adfiajj8n88nb" =
+    parse_dos("8sadhffhaf8do()cnojadf9009adfdon't()nioo79ahfoiahdo()iajj8n88nb")
 }
 
 pub fn parse_instructions_test() {
