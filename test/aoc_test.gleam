@@ -1,64 +1,33 @@
-import aoc.{
-  Down, Out, Up, check_dampener, check_record, check_safety, convert_to_diffs,
-  drop_by_index, evaluate_safe, parse,
-}
+import aoc.{parse_instructions, run_calculations, sumup}
 import gleeunit
 import gleeunit/should
 
 pub fn main() {
   gleeunit.main()
-  //  gen_var_test()
+  //  ingest_instruction_test()
 }
 
-pub fn parse_test() {
-  let records = parse("5 6 1 2 3 4\r\n11 22 3 7 0\r\n3 4 7 8 10\r\n0")
-  should.equal(records, [
-    [5, 6, 1, 2, 3, 4],
-    [11, 22, 3, 7, 0],
-    [3, 4, 7, 8, 10],
-    [0],
-  ])
+pub fn parse_instructions_test() {
+  should.equal(parse_instructions("mul(1,1)"), ["mul(1,1)"])
+  should.equal(parse_instructions("fffmul(1,1)"), ["mul(1,1)"])
+  should.equal(parse_instructions("mul(1,1)xxx"), ["mul(1,1)"])
+  should.equal(parse_instructions("09(b)mul(1,1)xxx"), ["mul(1,1)"])
+  should.equal(parse_instructions("mul(1,1)mul(2,2)"), ["mul(1,1)", "mul(2,2)"])
+  should.equal(
+    parse_instructions(
+      "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)\r\n+mul(32,64]then(mul(11,8)mul(8,5))",
+    ),
+    ["mul(2,4)", "mul(5,5)", "mul(11,8)", "mul(8,5)"],
+  )
 }
 
-pub fn drop_by_index_test() {
-  let assert [2, 3] = drop_by_index([1, 2, 3], 0)
-  let assert [1, 3] = drop_by_index([1, 2, 3], 1)
-  let assert [1, 2] = drop_by_index([1, 2, 3], 2)
+pub fn run_calculations_test() {
+  should.equal(run_calculations(["mul(2,2)"]), [4])
+  should.equal(run_calculations(["mul(101,24)"]), [2424])
+  should.equal(run_calculations(["mul(2,2)", "mul(101,24)"]), [4, 2424])
 }
 
-pub fn check_dampener_test() {
-  let assert True = check_dampener([10, 2, 3])
-  let assert True = check_dampener([1, 2, 30])
-  let assert False = check_dampener([10, 2, 30])
-}
-
-pub fn check_record_test() {
-  let assert True = check_record([1, 2, 3])
-  let assert True = check_record([10, 2, 3])
-  let assert False = check_record([2, 2, 2])
-}
-
-pub fn check_safety_test() {
-  let assert [False, False, True, True, False, True] =
-    check_safety([
-      [5, 6, 1, 2, 3, 4],
-      [11, 22, 3, 7, 0],
-      [3, 4, 7, 8, 10],
-      [3, 4, 4, 7, 8, 10],
-      [3, 4, 4, 4, 7, 8, 10],
-      [0],
-    ])
-}
-
-pub fn convert_to_diffs_test() {
-  let assert [Up, Out, Up, Up, Down] = convert_to_diffs([5, 6, 1, 2, 4, 3])
-  let assert [Up, Out, Up, Up, Up] = convert_to_diffs([3, 4, 4, 7, 8, 10])
-  let assert [] = convert_to_diffs([0])
-}
-
-pub fn evaluate_safe_test() {
-  let assert False = evaluate_safe([Up, Out, Up, Up, Down])
-  let assert True = evaluate_safe([Up, Up, Up, Up, Up])
-  let assert True = evaluate_safe([Down, Down, Down, Down, Down])
-  let assert True = evaluate_safe([])
+pub fn sumup_test() {
+  should.equal(sumup([4]), 4)
+  should.equal(sumup([4, 5]), 9)
 }
